@@ -19,18 +19,10 @@ data "azurerm_key_vault_secret" "openshift" {
   key_vault_id = "${data.azurerm_key_vault.openshift.id}"
 }
 
-output "secret_value" {
-  value = "${data.azurerm_key_vault_secret.openshift.value}"
-}
-
 resource "azurerm_storage_account" "registry" {
   name                     = "ncolonregistry"
   resource_group_name      = "${azurerm_resource_group.openshift.name}"
   location                 = "${var.datacenter}"
   account_tier             = "Standard"
   account_replication_type = "GRS"
-}
-
-output "registry_primary_key" {
-    value = "${azurerm_storage_account.registry.primary_access_key}"
 }

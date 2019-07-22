@@ -37,6 +37,7 @@ resource "azurerm_subnet" "storage" {
 # az network public-ip create --resource-group openshift --name masterExternalLB --allocation-method Static
 resource "azurerm_public_ip" "masterExternalLB" {
     name                = "masterExternalLB"
+    domain_name_label   = "master-${var.hostname_prefix}"
     location            = "${var.datacenter}"
     resource_group_name = "${azurerm_resource_group.openshift.name}"
     allocation_method   = "Static"
@@ -88,6 +89,7 @@ resource "azurerm_lb_rule" "ocpApiHealth" {
 # az network public-ip create --resource-group openshift --name routerExternalLB --allocation-method Static
 resource "azurerm_public_ip" "routerExternalLB" {
     name                = "routerExternalLB"
+    domain_name_label   = "app-${var.hostname_prefix}"
     location            = "${var.datacenter}"
     resource_group_name = "${azurerm_resource_group.openshift.name}"
     allocation_method   = "Static"

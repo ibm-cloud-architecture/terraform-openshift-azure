@@ -32,7 +32,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "master" {
 # az vm create --resource-group openshift --name ocp-master-$i --availability-set ocp-master-instances --size Standard_D4s_v3 --image RedHat:RHEL:7-RAW:latest --admin-user cloud-user --ssh-key /root/.ssh/id_rsa.pub --data-disk-sizes-gb 32 --nics ocp-master-${i}VMNic
 resource "azurerm_virtual_machine" "master" {
     count                   = "${var.master_count}"
-    name                    = "ocp-master-${count.index + 1}"
+    name                    = "${var.hostname_prefix}-master-${count.index + 1}"
     location                = "${var.datacenter}"
     resource_group_name     = "${azurerm_resource_group.openshift.name}"
     network_interface_ids   = ["${element(azurerm_network_interface.master.*.id,count.index)}"]
@@ -72,7 +72,7 @@ resource "azurerm_virtual_machine" "master" {
     }
 
     os_profile {
-        computer_name  = "master-${count.index + 1}"
+        computer_name  = "${var.hostname_prefix}-master-${count.index + 1}"
         admin_username = "${var.openshift_vm_admin_user}"
     }
     os_profile_linux_config {
@@ -86,9 +86,40 @@ resource "azurerm_virtual_machine" "master" {
 
 resource "azurerm_dns_a_record" "master" {
     count               = "${var.master_count}"
-    name                = "master-${count.index + 1}"
+    name                = "${var.hostname_prefix}-master-${count.index + 1}"
     zone_name           = "${azurerm_dns_zone.private.name}"
     resource_group_name = "${azurerm_resource_group.openshift.name}"
     ttl                 = 300
     records             = ["${element(azurerm_network_interface.master.*.private_ip_address,count.index)}"]
+}
+
+resource "null_resource" "copy_ssh_key_master" {
+    count    = "${var.openshift_vm_admin_user == "root" ? 0 : var.master_count}"
+    connection {
+        type     = "ssh"
+        user     = "${var.openshift_vm_admin_user}"
+        host     = "${element(azurerm_network_interface.master.*.private_ip_address, count.index)}"
+        private_key = "${file(var.bastion_private_ssh_key)}"
+        bastion_host = "${azurerm_public_ip.bastion.ip_address}"
+        bastion_host_key = "${file(var.bastion_private_ssh_key)}"
+    }
+
+    provisioner "file" {
+        source      = "${var.bastion_private_ssh_key}"
+        destination = "~/.ssh/id_rsa"
+    }
+
+    provisioner "remote-exec" {
+        inline = [
+            "chmod 600 ~/.ssh/id_rsa",
+            "sudo mkdir /root/.ssh",
+            "sudo cp ~/.ssh/authorized_keys /root/.ssh/",
+            "sudo cp ~/.ssh/id_rsa /root/.ssh/id_rsa",
+            "sudo chmod 600 /root/.ssh/id_rsa",
+        ]
+    }
+    depends_on = [
+        "azurerm_virtual_machine.bastion",
+        "azurerm_virtual_machine.master"
+    ]
 }

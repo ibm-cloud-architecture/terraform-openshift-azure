@@ -26,7 +26,7 @@ resource "azurerm_network_interface" "bastion" {
 # az vm create --resource-group openshift --name bastion --size Standard_D1 --image RedHat:RHEL:7-RAW:latest --admin-user cloud-user --ssh-key /root/.ssh/id_rsa.pub --nics bastion-VMNic
 
 resource "azurerm_virtual_machine" "bastion" {
-    name                    = "ocp-bastion"
+    name                    = "${var.hostname_prefix}-bastion-${count.index + 1}"
     location                = "${var.datacenter}"
     resource_group_name     = "${azurerm_resource_group.openshift.name}"
     network_interface_ids   = ["${azurerm_network_interface.bastion.id}"]
@@ -50,7 +50,7 @@ resource "azurerm_virtual_machine" "bastion" {
     }
 
     os_profile {
-        computer_name  = "bastion"
+        computer_name  = "${var.hostname_prefix}-bastion"
         admin_username = "${var.openshift_vm_admin_user}"
     }
 
@@ -64,9 +64,38 @@ resource "azurerm_virtual_machine" "bastion" {
 }
 
 resource "azurerm_dns_a_record" "bastion" {
-    name                = "bastion"
+    name                = "${var.hostname_prefix}-bastion"
     zone_name           = "${azurerm_dns_zone.private.name}"
     resource_group_name = "${azurerm_resource_group.openshift.name}"
     ttl                 = 300
     records             = ["${azurerm_network_interface.bastion.private_ip_address}"]
+}
+
+
+
+
+resource "null_resource" "copy_ssh_key_bastion" {
+    count    = "${var.openshift_vm_admin_user == "root" ? 0 : 1}"
+    connection {
+        type     = "ssh"
+        user     = "${var.openshift_vm_admin_user}"
+        host     = "${azurerm_public_ip.bastion.ip_address}"
+        private_key = "${file(var.bastion_private_ssh_key)}"
+    }
+
+    provisioner "file" {
+        source      = "${var.bastion_private_ssh_key}"
+        destination = "~/.ssh/id_rsa"
+    }
+
+    provisioner "remote-exec" {
+        inline = [
+            "chmod 600 ~/.ssh/id_rsa",
+            "sudo mkdir /root/.ssh",
+            "sudo cp ~/.ssh/authorized_keys /root/.ssh/",
+            "sudo cp ~/.ssh/id_rsa /root/.ssh/id_rsa",
+            "sudo chmod 600 /root/.ssh/id_rsa",
+        ]
+    }
+    depends_on = ["azurerm_virtual_machine.bastion"]
 }

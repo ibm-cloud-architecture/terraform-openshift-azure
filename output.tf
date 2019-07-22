@@ -1,37 +1,87 @@
+#################################################
+# Output Bastion Node
+#################################################
+
 output "bastion_public_ip" {
     value = "${azurerm_public_ip.bastion.ip_address}"
 }
 
-output "console_public_ip" {
-    value = "${azurerm_public_ip.masterExternalLB.ip_address}"
+output "bastion_private_ip" {
+  value = "${azurerm_network_interface.bastion.private_ip_address}"
 }
 
-#
-# output "router_public_ip" {
-#   value = "${azurerm_public_ip.infra.ip_address}"
-# }
-#
-# output "node_count" {
-#   value = "${var.app_count}"
-# }
-#
-# output "master_count" {
-#   value = "${var.master_count}"
-# }
-#
-# output "infra_count" {
-#   value = "${var.infra_count}"
-# }
-#
-# output "admin_user" {
-#   value = "${var.openshift_vm_admin_user}"
-# }
-#
-# output "master_domain" {
-#   value = "${var.openshift_master_domain}"
-# }
-#
-# output "router_domain" {
-#   value = "${var.openshift_router_domain}"
-# }
-#
+output "bastion_hostname" {
+  value = "${azurerm_virtual_machine.bastion.name}"
+}
+
+# #################################################
+# # Output Master Node
+# #################################################
+output "master_private_ip" {
+  value = "${azurerm_network_interface.master.*.private_ip_address}"
+}
+
+output "master_hostname" {
+  value = "${azurerm_virtual_machine.master.*.name}"
+}
+
+output "master_public_ip" {
+  value = []
+}
+
+
+#################################################
+# Output Infra Node
+#################################################
+output "infra_private_ip" {
+  value = "${azurerm_network_interface.infra.*.private_ip_address}"
+}
+
+output "infra_hostname" {
+  value = "${azurerm_virtual_machine.infra.*.name}"
+}
+
+output "infra_public_ip" {
+  value = []
+}
+
+# #################################################
+# # Output App Node
+# #################################################
+output "app_private_ip" {
+  value = "${azurerm_network_interface.app.*.private_ip_address}"
+}
+
+output "app_hostname" {
+  value = "${azurerm_virtual_machine.app.*.name}"
+}
+
+output "app_public_ip" {
+  value = []
+}
+
+# #################################################
+# # Output Storage Node
+# #################################################
+output "storage_private_ip" {
+  value = "${azurerm_network_interface.storage.*.private_ip_address}"
+}
+
+output "storage_hostname" {
+  value = "${azurerm_virtual_machine.storage.*.name}"
+}
+
+output "storage_public_ip" {
+  value = []
+}
+
+#################################################
+# Output LBaaS VIP
+#################################################
+output "public_master_vip" {
+    value = "${azurerm_public_ip.masterExternalLB.fqdn}"
+}
+
+output "public_app_vip" {
+    value = "${azurerm_public_ip.routerExternalLB.fqdn}"
+}
