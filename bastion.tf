@@ -30,7 +30,7 @@ resource "azurerm_virtual_machine" "bastion" {
     location                = "${var.datacenter}"
     resource_group_name     = "${azurerm_resource_group.openshift.name}"
     network_interface_ids   = ["${azurerm_network_interface.bastion.id}"]
-    vm_size                 = "${var.bastion_flavor}"
+    vm_size                 = "${var.bastion["flavor"]}"
 
     delete_os_disk_on_termination    = true
     delete_data_disks_on_termination = true

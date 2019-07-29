@@ -36,7 +36,7 @@ resource "azurerm_virtual_machine" "app" {
     location                = "${var.datacenter}"
     resource_group_name     = "${azurerm_resource_group.openshift.name}"
     network_interface_ids   = ["${element(azurerm_network_interface.app.*.id,count.index)}"]
-    vm_size                 = "${var.app_flavor}"
+    vm_size                 = "${var.worker["flavor"]}"
     availability_set_id     = "${azurerm_availability_set.app.id}"
     delete_os_disk_on_termination    = true
     delete_data_disks_on_termination = true

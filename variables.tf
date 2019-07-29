@@ -13,26 +13,6 @@ variable "openshift_vm_admin_user" {
     default = "ocpadmin"
 }
 
-variable "master_flavor" {
-    default = "Standard_D4s_v3"
-}
-
-variable "infra_flavor" {
-    default = "Standard_D4s_v3"
-}
-
-variable "app_flavor" {
-    default = "Standard_D2S_v3"
-}
-
-variable "storage_flavor" {
-    default = "Standard_D8s_v3"
-}
-
-variable "bastion_flavor" {
-    default = "Standard_D1"
-}
-
 variable "openshift_master_cidr" {
     default = "10.0.1.0/24"
 }
