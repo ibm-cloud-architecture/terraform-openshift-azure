@@ -13,32 +13,16 @@ variable "openshift_vm_admin_user" {
     default = "ocpadmin"
 }
 
-variable "master_count" {
-    default = 1
-}
-
 variable "master_flavor" {
     default = "Standard_D4s_v3"
-}
-
-variable "infra_count" {
-    default = 1
 }
 
 variable "infra_flavor" {
     default = "Standard_D4s_v3"
 }
 
-variable "app_count" {
-    default = 1
-}
-
 variable "app_flavor" {
     default = "Standard_D2S_v3"
-}
-
-variable "storage_count" {
-    default = 3
 }
 
 variable "storage_flavor" {
@@ -66,3 +50,9 @@ variable "openshift_storage_cidr" {
 }
 
 variable "bastion_private_ssh_key" {}
+
+variable "bastion" {type = "map"}
+variable "master" {type = "map"}
+variable "infra" {type = "map"}
+variable "worker" {type = "map"}
+variable "storage" {type = "map"}

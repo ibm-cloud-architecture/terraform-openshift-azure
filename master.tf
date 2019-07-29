@@ -8,7 +8,7 @@ resource "azurerm_availability_set" "master" {
 
 # az network nic create --resource-group openshift --name ocp-master-${i}VMNic --vnet-name openshiftvnet --subnet ocp --network-security-group master-nsg --lb-name OcpMasterLB --lb-address-pools masterAPIBackend --internal-dns-name ocp-master-${i} --public-ip-address
 resource "azurerm_network_interface" "master" {
-    count                     = "${var.master_count}"
+    count                     = "${var.master["nodes"]}"
     name                      = "openshift-master-${count.index + 1}-nic"
     location                  = "${var.datacenter}"
     resource_group_name       = "${azurerm_resource_group.openshift.name}"
@@ -23,7 +23,7 @@ resource "azurerm_network_interface" "master" {
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "master" {
-    count                   = "${var.master_count}"
+    count                   = "${var.master["nodes"]}"
     network_interface_id    = "${element(azurerm_network_interface.master.*.id,count.index)}"
     ip_configuration_name   = "default"
     backend_address_pool_id = "${azurerm_lb_backend_address_pool.masterAPIBackend.id}"
@@ -31,7 +31,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "master" {
 
 # az vm create --resource-group openshift --name ocp-master-$i --availability-set ocp-master-instances --size Standard_D4s_v3 --image RedHat:RHEL:7-RAW:latest --admin-user cloud-user --ssh-key /root/.ssh/id_rsa.pub --data-disk-sizes-gb 32 --nics ocp-master-${i}VMNic
 resource "azurerm_virtual_machine" "master" {
-    count                   = "${var.master_count}"
+    count                   = "${var.master["nodes"]}"
     name                    = "${var.hostname_prefix}-master-${count.index + 1}"
     location                = "${var.datacenter}"
     resource_group_name     = "${azurerm_resource_group.openshift.name}"
@@ -85,7 +85,7 @@ resource "azurerm_virtual_machine" "master" {
 }
 
 resource "azurerm_dns_a_record" "master" {
-    count               = "${var.master_count}"
+    count               = "${var.master["nodes"]}"
     name                = "${var.hostname_prefix}-master-${count.index + 1}"
     zone_name           = "${azurerm_dns_zone.private.name}"
     resource_group_name = "${azurerm_resource_group.openshift.name}"
@@ -94,7 +94,7 @@ resource "azurerm_dns_a_record" "master" {
 }
 
 resource "null_resource" "copy_ssh_key_master" {
-    count    = "${var.openshift_vm_admin_user == "root" ? 0 : var.master_count}"
+    count    = "${var.openshift_vm_admin_user == "root" ? 0 : var.master["nodes"]}"
     connection {
         type     = "ssh"
         user     = "${var.openshift_vm_admin_user}"
