@@ -31,8 +31,8 @@ variable "openshift_storage_cidr" {
 
 variable "bastion_private_ssh_key" {}
 
-variable "bastion" {type = "map"}
-variable "master" {type = "map"}
-variable "infra" {type = "map"}
-variable "worker" {type = "map"}
-variable "storage" {type = "map"}
+variable "bastion" { type = "map" }
+variable "master"  { type = "map" }
+variable "infra"   { type = "map" }
+variable "worker"  { type = "map" }
+variable "storage" { type = "map" }

@@ -60,7 +60,7 @@ resource "azurerm_virtual_machine" "infra" {
         create_option     = "Empty"
         managed_disk_type = "Standard_LRS"
         lun               = 0
-        disk_size_gb      = 64
+        disk_size_gb      = "${var.infra["docker_disk_size"]}"
     }
 
     os_profile {

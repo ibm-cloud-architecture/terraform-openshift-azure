@@ -1,6 +1,6 @@
-# az vm availability-set create --resource-group openshift --name ocp-app-instances
+# az vm availability-set create --resource-group openshift --name ocp-worker-instances
 resource "azurerm_availability_set" "app" {
-    name                = "app-availability-set"
+    name                = "worker-availability-set"
     location            = "${var.datacenter}"
     resource_group_name = "${azurerm_resource_group.openshift.name}"
     managed             = true
@@ -9,11 +9,11 @@ resource "azurerm_availability_set" "app" {
 # az network nic create --resource-group openshift --name ocp-master-${i}VMNic --vnet-name openshiftvnet --subnet ocp --network-security-group master-nsg --lb-name OcpMasterLB --lb-address-pools masterAPIBackend --internal-dns-name ocp-master-${i} --public-ip-address
 resource "azurerm_network_interface" "app" {
     count                     = "${var.worker["nodes"]}"
-    name                      = "openshift-app-${count.index + 1}-nic"
+    name                      = "openshift-worker-${count.index + 1}-nic"
     location                  = "${var.datacenter}"
     resource_group_name       = "${azurerm_resource_group.openshift.name}"
     network_security_group_id = "${azurerm_network_security_group.app.id}"
-    internal_dns_name_label   = "app-${count.index + 1}"
+    internal_dns_name_label   = "worker-${count.index + 1}"
 
     ip_configuration {
         name                          = "default"
@@ -32,7 +32,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "app" {
 # az vm create --resource-group openshift --name ocp-master-$i --availability-set ocp-master-instances --size Standard_D4s_v3 --image RedHat:RHEL:7-RAW:latest --admin-user cloud-user --ssh-key /root/.ssh/id_rsa.pub --data-disk-sizes-gb 32 --nics ocp-master-${i}VMNic
 resource "azurerm_virtual_machine" "app" {
     count                   = "${var.worker["nodes"]}"
-    name                    = "${var.hostname_prefix}-app-${count.index + 1}"
+    name                    = "${var.hostname_prefix}-worker-${count.index + 1}"
     location                = "${var.datacenter}"
     resource_group_name     = "${azurerm_resource_group.openshift.name}"
     network_interface_ids   = ["${element(azurerm_network_interface.app.*.id,count.index)}"]
@@ -49,22 +49,22 @@ resource "azurerm_virtual_machine" "app" {
     }
 
     storage_os_disk {
-        name              = "app-os-disk-${count.index + 1}"
+        name              = "worker-os-disk-${count.index + 1}"
         caching           = "ReadWrite"
         create_option     = "FromImage"
         managed_disk_type = "Standard_LRS"
     }
 
     storage_data_disk {
-        name              = "app-docker-disk-${count.index + 1}"
+        name              = "worker-docker-disk-${count.index + 1}"
         create_option     = "Empty"
         managed_disk_type = "Standard_LRS"
         lun               = 0
-        disk_size_gb      = 64
+        disk_size_gb      = "${var.worker["docker_disk_size"]}"
     }
 
     os_profile {
-        computer_name  = "${var.hostname_prefix}-app-${count.index + 1}"
+        computer_name  = "${var.hostname_prefix}-worker-${count.index + 1}"
         admin_username = "${var.openshift_vm_admin_user}"
     }
 
@@ -79,7 +79,7 @@ resource "azurerm_virtual_machine" "app" {
 
 resource "azurerm_dns_a_record" "app" {
     count               = "${var.worker["nodes"]}"
-    name                = "${var.hostname_prefix}-app-${count.index + 1}"
+    name                = "${var.hostname_prefix}-worker-${count.index + 1}"
     zone_name           = "${azurerm_dns_zone.private.name}"
     resource_group_name = "${azurerm_resource_group.openshift.name}"
     ttl                 = 300

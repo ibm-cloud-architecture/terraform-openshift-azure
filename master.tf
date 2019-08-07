@@ -60,21 +60,14 @@ resource "azurerm_virtual_machine" "master" {
         create_option     = "Empty"
         managed_disk_type = "Standard_LRS"
         lun               = 0
-        disk_size_gb      = 32
-    }
-
-    storage_data_disk {
-        name              = "master-etcd-disk-${count.index + 1}"
-        create_option     = "Empty"
-        managed_disk_type = "Standard_LRS"
-        lun               = 1
-        disk_size_gb      = 32
+        disk_size_gb      = "${var.master["docker_disk_size"]}"
     }
 
     os_profile {
         computer_name  = "${var.hostname_prefix}-master-${count.index + 1}"
         admin_username = "${var.openshift_vm_admin_user}"
     }
+    
     os_profile_linux_config {
         disable_password_authentication = true
         ssh_keys {

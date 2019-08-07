@@ -60,7 +60,7 @@ resource "azurerm_virtual_machine" "storage" {
         create_option     = "Empty"
         managed_disk_type = "Standard_LRS"
         lun               = 0
-        disk_size_gb      = 64
+        disk_size_gb      = "${var.storage["docker_disk_size"]}"
     }
 
     storage_data_disk {
@@ -68,7 +68,7 @@ resource "azurerm_virtual_machine" "storage" {
         create_option     = "Empty"
         managed_disk_type = "Premium_LRS"
         lun               = 1
-        disk_size_gb      = 512
+        disk_size_gb      = "${var.storage["gluster_disk_size"]}"
     }
 
     os_profile {
