@@ -46,17 +46,17 @@ output "infra_public_ip" {
 }
 
 # #################################################
-# # Output App Node
+# # Output worker Node
 # #################################################
-output "app_private_ip" {
-  value = "${azurerm_network_interface.app.*.private_ip_address}"
+output "worker_private_ip" {
+  value = "${azurerm_network_interface.worker.*.private_ip_address}"
 }
 
-output "app_hostname" {
-  value = "${azurerm_virtual_machine.app.*.name}"
+output "worker_hostname" {
+  value = "${azurerm_virtual_machine.worker.*.name}"
 }
 
-output "app_public_ip" {
+output "worker_public_ip" {
   value = []
 }
 
@@ -82,6 +82,34 @@ output "public_master_vip" {
     value = "${azurerm_public_ip.masterExternalLB.fqdn}"
 }
 
-output "public_app_vip" {
+output "public_worker_vip" {
     value = "${azurerm_public_ip.routerExternalLB.fqdn}"
+}
+
+#################################################
+# Output Azure CloudProvider
+#################################################
+output "azure_client_id" {
+    value = "${azuread_service_principal.auth.application_id}"
+}
+
+output "azure_client_secret" {
+    value = "${azuread_service_principal_password.auth.value}"
+    sensitive = true
+}
+
+output "azure_tenant_id" {
+    value = "${data.azurerm_client_config.current.tenant_id}"
+}
+
+output "azure_subscription_id" {
+    value = "${data.azurerm_client_config.current.subscription_id}"
+}
+
+output "azure_storage_account" {
+    value = "${azurerm_storage_account.registry.name}"
+}
+
+output "azure_storage_accountkey" {
+    value = "${azurerm_storage_account.registry.primary_access_key}"
 }

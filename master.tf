@@ -1,4 +1,4 @@
-# # az vm availability-set create --resource-group openshift --name ocp-master-instances
+# az vm availability-set create --resource-group openshift --name ocp-master-instances
 resource "azurerm_availability_set" "master" {
     name                = "master-availability-set"
     location            = "${var.datacenter}"
@@ -67,12 +67,12 @@ resource "azurerm_virtual_machine" "master" {
         computer_name  = "${var.hostname_prefix}-master-${count.index + 1}"
         admin_username = "${var.openshift_vm_admin_user}"
     }
-    
+
     os_profile_linux_config {
         disable_password_authentication = true
         ssh_keys {
             path = "/home/${var.openshift_vm_admin_user}/.ssh/authorized_keys"
-            key_data = "${file("~/.ssh/openshift_rsa.pub")}"
+            key_data = "${file(var.bastion_public_ssh_key)}"
         }
     }
 }

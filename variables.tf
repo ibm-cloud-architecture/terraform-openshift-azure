@@ -30,6 +30,7 @@ variable "openshift_storage_cidr" {
 }
 
 variable "bastion_private_ssh_key" {}
+variable "bastion_public_ssh_key" {}
 
 variable "bastion" { type = "map" }
 variable "master"  { type = "map" }

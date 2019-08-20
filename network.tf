@@ -20,8 +20,8 @@ resource "azurerm_subnet" "infra" {
   address_prefix       = "${var.openshift_infra_cidr}"
 }
 
-resource "azurerm_subnet" "app" {
-  name                 = "app-subnet"
+resource "azurerm_subnet" "worker" {
+  name                 = "worker-subnet"
   resource_group_name  = "${azurerm_resource_group.openshift.name}"
   virtual_network_name = "${azurerm_virtual_network.openshift.name}"
   address_prefix       = "${var.openshift_node_cidr}"
@@ -89,7 +89,7 @@ resource "azurerm_lb_rule" "ocpApiHealth" {
 # az network public-ip create --resource-group openshift --name routerExternalLB --allocation-method Static
 resource "azurerm_public_ip" "routerExternalLB" {
     name                = "routerExternalLB"
-    domain_name_label   = "app-${var.hostname_prefix}"
+    domain_name_label   = "worker-${var.hostname_prefix}"
     location            = "${var.datacenter}"
     resource_group_name = "${azurerm_resource_group.openshift.name}"
     allocation_method   = "Static"

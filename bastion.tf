@@ -26,7 +26,7 @@ resource "azurerm_network_interface" "bastion" {
 # az vm create --resource-group openshift --name bastion --size Standard_D1 --image RedHat:RHEL:7-RAW:latest --admin-user cloud-user --ssh-key /root/.ssh/id_rsa.pub --nics bastion-VMNic
 
 resource "azurerm_virtual_machine" "bastion" {
-    name                    = "${var.hostname_prefix}-bastion-${count.index + 1}"
+    name                    = "${var.hostname_prefix}-bastion"
     location                = "${var.datacenter}"
     resource_group_name     = "${azurerm_resource_group.openshift.name}"
     network_interface_ids   = ["${azurerm_network_interface.bastion.id}"]
@@ -58,7 +58,7 @@ resource "azurerm_virtual_machine" "bastion" {
         disable_password_authentication = true
         ssh_keys {
             path = "/home/${var.openshift_vm_admin_user}/.ssh/authorized_keys"
-            key_data = "${file("~/.ssh/openshift_rsa.pub")}"
+            key_data = "${file(var.bastion_public_ssh_key)}"
         }
     }
 }

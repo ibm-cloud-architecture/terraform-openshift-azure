@@ -72,7 +72,7 @@ resource "azurerm_virtual_machine" "infra" {
         disable_password_authentication = true
         ssh_keys {
             path = "/home/${var.openshift_vm_admin_user}/.ssh/authorized_keys"
-            key_data = "${file("~/.ssh/openshift_rsa.pub")}"
+            key_data = "${file(var.bastion_public_ssh_key)}"
         }
     }
 }

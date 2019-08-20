@@ -1,5 +1,6 @@
 # az vm availability-set create --resource-group openshift --name ocp-app-instances
 resource "azurerm_availability_set" "storage" {
+    count               = "${var.storage["nodes"] == "0" ? 0 : 1}"
     name                = "storage-availability-set"
     location            = "${var.datacenter}"
     resource_group_name = "${azurerm_resource_group.openshift.name}"
@@ -12,7 +13,7 @@ resource "azurerm_network_interface" "storage" {
     name                      = "openshift-storage-${count.index + 1}-nic"
     location                  = "${var.datacenter}"
     resource_group_name       = "${azurerm_resource_group.openshift.name}"
-    network_security_group_id = "${azurerm_network_security_group.storage.id}"
+    network_security_group_id = "${azurerm_network_security_group.storage.0.id}"
     internal_dns_name_label = "storage-${count.index + 1}"
 
     ip_configuration {
@@ -37,7 +38,7 @@ resource "azurerm_virtual_machine" "storage" {
     resource_group_name     = "${azurerm_resource_group.openshift.name}"
     network_interface_ids   = ["${element(azurerm_network_interface.storage.*.id,count.index)}"]
     vm_size                 = "${var.storage["flavor"]}"
-    availability_set_id     = "${azurerm_availability_set.storage.id}"
+    availability_set_id     = "${azurerm_availability_set.storage.0.id}"
     delete_os_disk_on_termination    = true
     delete_data_disks_on_termination = true
 
@@ -80,13 +81,13 @@ resource "azurerm_virtual_machine" "storage" {
         disable_password_authentication = true
         ssh_keys {
             path = "/home/${var.openshift_vm_admin_user}/.ssh/authorized_keys"
-            key_data = "${file("~/.ssh/openshift_rsa.pub")}"
+            key_data = "${file(var.bastion_public_ssh_key)}"
         }
     }
 }
 
 resource "azurerm_dns_a_record" "storage" {
-    count               = "${var.infra["nodes"]}"
+    count               = "${var.storage["nodes"]}"
     name                = "${var.hostname_prefix}-storage-${count.index + 1}"
     zone_name           = "${azurerm_dns_zone.private.name}"
     resource_group_name = "${azurerm_resource_group.openshift.name}"
