@@ -2,8 +2,8 @@
 variable "datacenter" {}
 
 variable "cluster_resource_group" {}
-variable "keyvault_resource_group" {}
-variable "keyvault_name" {}
+# variable "keyvault_resource_group" {}
+# variable "keyvault_name" {}
 
 variable "hostname_prefix" {
     default = "ocp-azure"

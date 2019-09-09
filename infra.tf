@@ -72,7 +72,7 @@ resource "azurerm_virtual_machine" "infra" {
         disable_password_authentication = true
         ssh_keys {
             path = "/home/${var.openshift_vm_admin_user}/.ssh/authorized_keys"
-            key_data = "${file(var.bastion_public_ssh_key)}"
+            key_data = "${var.bastion_public_ssh_key}"
         }
     }
 }
@@ -92,13 +92,13 @@ resource "null_resource" "copy_ssh_key_infra" {
         type     = "ssh"
         user     = "${var.openshift_vm_admin_user}"
         host     = "${element(azurerm_network_interface.infra.*.private_ip_address, count.index)}"
-        private_key = "${file(var.bastion_private_ssh_key)}"
+        private_key = "${var.bastion_private_ssh_key}"
         bastion_host = "${azurerm_public_ip.bastion.ip_address}"
-        bastion_host_key = "${file(var.bastion_private_ssh_key)}"
+        bastion_host_key = "${var.bastion_private_ssh_key}"
     }
 
     provisioner "file" {
-        source      = "${var.bastion_private_ssh_key}"
+        content     = "${var.bastion_private_ssh_key}"
         destination = "~/.ssh/id_rsa"
     }
 
