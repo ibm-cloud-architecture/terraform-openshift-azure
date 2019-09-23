@@ -116,7 +116,7 @@ output "azure_storage_accountkey" {
 
 
 output "module_completed" {
-  value = value = "${join(",", concat(
+  value = "${join(",", concat(
     "${list(azurerm_network_interface.bastion.private_ip_address)}",
     "${azurerm_network_interface.master.*.private_ip_address}",
     "${azurerm_network_interface.infra.*.private_ip_address}",
