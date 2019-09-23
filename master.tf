@@ -80,7 +80,7 @@ resource "azurerm_virtual_machine" "master" {
 resource "azurerm_dns_a_record" "master" {
     count               = "${var.master["nodes"]}"
     name                = "${var.hostname_prefix}-master-${count.index + 1}"
-    zone_name           = "${azurerm_dns_zone.private.name}"
+    zone_name           = "${azurerm_private_dns_zone.private.name}"
     resource_group_name = "${azurerm_resource_group.openshift.name}"
     ttl                 = 300
     records             = ["${element(azurerm_network_interface.master.*.private_ip_address,count.index)}"]

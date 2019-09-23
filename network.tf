@@ -153,8 +153,7 @@ resource "azurerm_lb_rule" "httpsRouterRule" {
     load_distribution              = "SourceIPProtocol"
 }
 
-resource "azurerm_dns_zone" "private" {
+resource "azurerm_private_dns_zone" "private" {
   name                = "openshift.local"
   resource_group_name = "${azurerm_resource_group.openshift.name}"
-  zone_type           = "Private"
 }
