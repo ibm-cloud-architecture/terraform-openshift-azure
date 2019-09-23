@@ -77,7 +77,7 @@ resource "azurerm_virtual_machine" "worker" {
     }
 }
 
-resource "azurerm_dns_a_record" "worker" {
+resource "azurerm_private_dns_a_record" "worker" {
     count               = "${var.worker["nodes"]}"
     name                = "${var.hostname_prefix}-worker-${count.index + 1}"
     zone_name           = "${azurerm_private_dns_zone.private.name}"

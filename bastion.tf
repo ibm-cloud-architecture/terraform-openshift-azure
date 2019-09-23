@@ -63,7 +63,7 @@ resource "azurerm_virtual_machine" "bastion" {
     }
 }
 
-resource "azurerm_dns_a_record" "bastion" {
+resource "azurerm_private_dns_a_record" "bastion" {
     name                = "${var.hostname_prefix}-bastion"
     zone_name           = "${azurerm_private_dns_zone.private.name}"
     resource_group_name = "${azurerm_resource_group.openshift.name}"

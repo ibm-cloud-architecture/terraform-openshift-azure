@@ -86,7 +86,7 @@ resource "azurerm_virtual_machine" "storage" {
     }
 }
 
-resource "azurerm_dns_a_record" "storage" {
+resource "azurerm_private_dns_a_record" "storage" {
     count               = "${var.storage["nodes"]}"
     name                = "${var.hostname_prefix}-storage-${count.index + 1}"
     zone_name           = "${azurerm_private_dns_zone.private.name}"

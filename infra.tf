@@ -77,7 +77,7 @@ resource "azurerm_virtual_machine" "infra" {
     }
 }
 
-resource "azurerm_dns_a_record" "infra" {
+resource "azurerm_private_dns_a_record" "infra" {
     count               = "${var.infra["nodes"]}"
     name                = "${var.hostname_prefix}-infra-${count.index + 1}"
     zone_name           = "${azurerm_private_dns_zone.private.name}"

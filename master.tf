@@ -77,7 +77,7 @@ resource "azurerm_virtual_machine" "master" {
     }
 }
 
-resource "azurerm_dns_a_record" "master" {
+resource "azurerm_private_dns_a_record" "master" {
     count               = "${var.master["nodes"]}"
     name                = "${var.hostname_prefix}-master-${count.index + 1}"
     zone_name           = "${azurerm_private_dns_zone.private.name}"
