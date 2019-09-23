@@ -50,7 +50,7 @@ resource "azurerm_virtual_machine" "bastion" {
     }
 
     storage_data_disk {
-        name              = "bastion-docker-disk}"
+        name              = "bastion-docker-disk"
         create_option     = "Empty"
         managed_disk_type = "Standard_LRS"
         lun               = 0
