@@ -117,10 +117,10 @@ output "azure_storage_accountkey" {
 
 output "module_completed" {
   value = "${join(",", concat(
-    "${list(azurerm_network_interface.bastion.private_ip_address)}",
-    "${azurerm_network_interface.master.*.private_ip_address}",
-    "${azurerm_network_interface.infra.*.private_ip_address}",
-    "${azurerm_network_interface.worker.*.private_ip_address}",
-    "${azurerm_network_interface.storage.*.private_ip_address}",
+    "${list(azurerm_virtual_machine.bastion.id)}",
+    "${azurerm_virtual_machine.master.*.private_ip_address}",
+    "${azurerm_virtual_machine.infra.*.private_ip_address}",
+    "${azurerm_virtual_machine.worker.*.private_ip_address}",
+    "${azurerm_virtual_machine.storage.*.private_ip_address}",
   ))}"
 }
