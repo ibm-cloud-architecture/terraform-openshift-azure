@@ -49,6 +49,14 @@ resource "azurerm_virtual_machine" "bastion" {
         managed_disk_type = "Standard_LRS"
     }
 
+    storage_data_disk {
+        name              = "bastion-docker-disk-${count.index + 1}"
+        create_option     = "Empty"
+        managed_disk_type = "Standard_LRS"
+        lun               = 0
+        disk_size_gb      = "${var.bastion["docker_disk_size"]}"
+    }
+
     os_profile {
         computer_name  = "${var.hostname_prefix}-bastion"
         admin_username = "${var.openshift_vm_admin_user}"
