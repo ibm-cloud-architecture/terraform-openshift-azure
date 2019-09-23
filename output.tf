@@ -113,3 +113,14 @@ output "azure_storage_account" {
 output "azure_storage_accountkey" {
     value = "${azurerm_storage_account.registry.primary_access_key}"
 }
+
+
+output "module_completed" {
+  value = value = "${join(",", concat(
+    "${list(azurerm_network_interface.bastion.private_ip_address)}",
+    "${azurerm_network_interface.master.*.private_ip_address}",
+    "${azurerm_network_interface.infra.*.private_ip_address}",
+    "${azurerm_network_interface.worker.*.private_ip_address}",
+    "${azurerm_network_interface.storage.*.private_ip_address}",
+  ))
+}
