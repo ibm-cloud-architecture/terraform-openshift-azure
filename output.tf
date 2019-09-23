@@ -122,5 +122,4 @@ output "module_completed" {
     "${azurerm_network_interface.infra.*.private_ip_address}",
     "${azurerm_network_interface.worker.*.private_ip_address}",
     "${azurerm_network_interface.storage.*.private_ip_address}",
-  ))
-}
+  ))}"
